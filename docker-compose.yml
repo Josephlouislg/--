@@ -1,0 +1,48 @@
+version: '3.5'
+services:
+  web:
+    image: web
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/usr/src/app'
+    ports:
+      - 5002:5000
+    environment:
+      - APP_NAME=students_db
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=0
+      - APP_SETTINGS=project.server.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/test
+      - DATABASE_TEST_URL=postgres://postgres:postgres@db:5432/postgres
+      - SECRET_KEY=change_me_in_prod
+    depends_on:
+      - db
+  db:
+    image: postgres:10.3-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  react:
+    image: node:latest
+    ports:
+      - 3000:3000
+    command: npm start
+    working_dir: "/frontend" 
+    volumes:
+      - "../frontend/:/frontend"
+  nginx:
+    image: nginx:1.14.0-alpine
+    ports:
+      - "81:81"
+    volumes:
+      - "./configs/nginx.conf:/etc/nginx/nginx.conf"
+    depends_on:
+      - react
+      - web
+      

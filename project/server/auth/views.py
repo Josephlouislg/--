@@ -12,12 +12,15 @@ from project.server import bcrypt, db
 from project.server.model.user import User
 from project.server.auth.forms import LoginForm, RegisterForm
 
+from project.tasks.sender import send
 
 auth_blueprint = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@auth_blueprint.route('/register', methods=['POST'])
+@auth_blueprint.route('/register', methods=['POST', 'GET'])
 def register():
+    send.delay(1)
+    return jsonify({"status": "ok", "user_id": "user.id"})
     form = RegisterForm(**request.get_json())
     if form.validate():
         user = User(
@@ -29,11 +32,8 @@ def register():
         )
         db.session.add(user)
         db.session.commit()
-
         login_user(user)
-
         return jsonify({"status": "ok", "user_id": user.id})
-
     return jsonify({"errors": form.errors})
 
 

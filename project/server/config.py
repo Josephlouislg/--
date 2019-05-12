@@ -11,6 +11,11 @@ class BaseConfig(object):
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
+    CELERY = {
+        "app_name": "task",
+        # "broker": "amqp://guest:guest@rabbit:5672"
+        "broker": "redis://redis:6379/0",
+    }
 
 
 class DevelopmentConfig(BaseConfig):

@@ -6,11 +6,14 @@ from flask.cli import FlaskGroup
 
 from project.server import create_app, db
 from project.server.models import *
+from project.tasks import init_celery
+
 import subprocess
 import sys
 
 app = create_app()
 cli = FlaskGroup(create_app=create_app)
+celery_app = init_celery(app)
 
 
 COV = coverage.coverage(

@@ -19,6 +19,7 @@ services:
       - SECRET_KEY=change_me_in_prod
     depends_on:
       - db
+
   db:
     image: postgres:10.3-alpine
     ports:
@@ -36,6 +37,7 @@ services:
     working_dir: "/frontend" 
     volumes:
       - "../frontend/:/frontend"
+
   nginx:
     image: nginx:1.14.0-alpine
     ports:
@@ -45,4 +47,32 @@ services:
     depends_on:
       - react
       - web
-      
+
+  redis:
+    image: redis
+    ports:
+      - 6379
+
+  rabbit:
+    image: rabbitmq
+    ports:
+      - 5672
+
+  celery:
+    image: web
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: python -m project.tasks
+    volumes:
+      - '.:/usr/src/app'
+    environment:
+      - APP_NAME=students_db
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=0
+      - APP_SETTINGS=project.server.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/test
+      - DATABASE_TEST_URL=postgres://postgres:postgres@db:5432/postgres
+      - SECRET_KEY=change_me_in_prod
+    depends_on:
+      - db

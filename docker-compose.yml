@@ -45,7 +45,6 @@ services:
     volumes:
       - "./configs/nginx.conf:/etc/nginx/nginx.conf"
     depends_on:
-      - react
       - web
 
   redis:
@@ -76,3 +75,4 @@ services:
       - SECRET_KEY=change_me_in_prod
     depends_on:
       - db
+      - redis

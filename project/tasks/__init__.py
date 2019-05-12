@@ -3,6 +3,7 @@ import importlib
 from celery.app.task import Task
 import celery
 
+from project.lib.email_sender import EmailSender
 
 def register_tasks(real_app):
     module_names = (
@@ -20,5 +21,7 @@ def init_celery(app):
     celery_app = celery.Celery(app.import_name, broker=app.config['CELERY']['broker'])
     celery_app.conf.update(app.config['CELERY'])
     register_tasks(celery_app)
+    sender = EmailSender()
+    celery_app.sender = sender
     celery_app.finalize()
     return celery_app

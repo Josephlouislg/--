@@ -7,7 +7,9 @@ class BaseConfig(object):
     """Base configuration."""
     APP_NAME = os.getenv('APP_NAME', 'students_db')
     BCRYPT_LOG_ROUNDS = 4
+    # SERVER_NAME = "localhost"
     DEBUG_TB_ENABLED = False
+    HOST = '"127.0.0.1:81'
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False

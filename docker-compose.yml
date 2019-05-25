@@ -34,9 +34,9 @@ services:
     ports:
       - 3000:3000
     command: npm start
-    working_dir: "/frontend" 
+    working_dir: "/front"
     volumes:
-      - "../frontend/:/frontend"
+      - "../front/:/front"
 
   nginx:
     image: nginx:1.14.0-alpine

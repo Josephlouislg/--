@@ -1,5 +1,7 @@
 import os
 
+from redis import Redis
+
 from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
@@ -10,6 +12,7 @@ from flask_migrate import Migrate
 
 
 # instantiate the extensions
+
 login_manager = LoginManager()
 bcrypt = Bcrypt()
 toolbar = DebugToolbarExtension()
@@ -17,14 +20,25 @@ bootstrap = Bootstrap()
 db = SQLAlchemy()
 migrate = Migrate()
 
+redis = Redis(host='redis', port=6379, db=0)
+
 
 def create_base_app():
     # instantiate the app
+    from project.server.model.user import User
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message_category = 'danger'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.filter(User.id == int(user_id)).first()
+
     app = Flask(
         __name__,
         template_folder='../client/templates',
         static_folder='../client/static'
     )
+    app.secret_key = 'super secret string'  # Change this!
 
     app_settings = os.getenv(
         'APP_SETTINGS', 'project.server.config.DevelopmentConfig')
@@ -48,20 +62,13 @@ def create_base_app():
     # app.register_blueprint(university_bp)
     app.register_blueprint(group_bp)
     # app.register_blueprint(fuc_bp)
+
     return app
 
 
 def create_app(script_info=None):
 
     app = create_base_app()
-
-    from project.server.model.user import User
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message_category = 'danger'
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.filter(User.id == int(user_id)).first()
 
     # error handlers
     @app.errorhandler(401)

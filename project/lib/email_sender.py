@@ -17,6 +17,7 @@ class EmailSender(object):
 
 		{body}
 		"""
+		print(msg_text)
 		return msg_text
 
 	@contextmanager

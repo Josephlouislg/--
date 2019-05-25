@@ -1,12 +1,13 @@
 import datetime
 
 from flask import current_app
+from flask_login import UserMixin
 
 from project.server import db, bcrypt
 from project.lib.types import TitledEnum, EnumInt
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
 
     __tablename__ = 'user'
 
@@ -32,12 +33,34 @@ class User(db.Model):
         self.registered_on = datetime.datetime.now()
         super().__init__(*args, **kwargs)
 
+    # @property
+    # def is_active(self):
+    #     return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
     @property
     def is_active(self):
         return True
 
+    @property
+    def is_anonymous(self):
+        return False
+
     def get_id(self):
         return self.id
+
+    def serialized(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "phone": self.phone,
+            "status": self.status.value
+        }
 
     def __repr__(self):
         return '<User {0}, id:{1}>'.format(self.email, self.id)

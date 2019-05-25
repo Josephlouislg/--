@@ -5,5 +5,5 @@ from project.server.model.user import User
 
 
 @task(bind=True)
-def send(self, a):
-	self.app.sender.send(['vlad201297stetsenko@gmail.com'], 'test', 'test')
+def send(self, emails, subject, body):
+	self.app.sender.send(emails, subject, body)

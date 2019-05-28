@@ -59,7 +59,8 @@ class User(db.Model, UserMixin):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "phone": self.phone,
-            "status": self.status.value
+            "status": self.status.value,
+            "is_admin": True
         }
 
     def __repr__(self):

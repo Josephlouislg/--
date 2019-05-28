@@ -78,3 +78,7 @@ class TitledEnum(Enum):
     @classmethod
     def get_as_enum_by_title(cls, title, default=None):
         return next((e for e in cls if e.title == title), default)
+
+    @classmethod
+    def get_as_enum_by_value(cls, value, default=None):
+        return next((e for e in cls if e.value == value), default)

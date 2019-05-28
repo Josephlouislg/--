@@ -1,7 +1,7 @@
 import random
 
 
-from flask import url_for
+from flask import url_for, render_template
 
 from project.server.model.user import User
 from project.tasks.sender import send
@@ -25,10 +25,11 @@ class NewUserService(object):
     def send_confirmation_email_msg(cls, user):
         token = cls.generate_confirfation_token(user)
         confirmation_url = f"{cls.SERVER_NAME}{url_for('auth.confirm_email', token=token, user_id=user.id)}"
+        body = render_template('emails/email_confirmation.html', confirmation_url=confirmation_url)
         send.delay(
             emails=(user.email,),
-            subject='dasdasddsa',
-            body=f'<a href="{confirmation_url}">dasdsddsadsa</a>'
+            subject='Підвтердження електронної адреси',
+            body=body
         )
 
     @classmethod

@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 class EmailSender(object):
@@ -8,17 +10,6 @@ class EmailSender(object):
 	def __init__(self, user='email.sender.fpm@gmail.com', password='testsenDer'):
 		self._user = user
 		self._password = password
-
-	def render_msg(self, emails, subject, body):
-		msg_text = f"""
-		From: {self._user}
-		To: {", ".join(emails)}
-		Subject: {subject}
-
-		{body}
-		"""
-		print(msg_text)
-		return msg_text
 
 	@contextmanager
 	def connection(self):
@@ -31,6 +22,11 @@ class EmailSender(object):
 			server.close()
 
 	def send(self, emails, subject, body):
-		msg = self.render_msg(emails, subject, body)
+		message = MIMEMultipart("alternative")
+		message["Subject"] = subject
+		message["From"] = self._user
+		message["To"] = ", ".join(emails)
+		msg_body = MIMEText(body, "html")
+		message.attach(msg_body)
 		with self.connection() as connection:
-			connection.sendmail(self._user, emails, msg)
+			connection.sendmail(self._user, emails, message.as_string())

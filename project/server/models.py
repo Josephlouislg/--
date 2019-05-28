@@ -1,10 +1,5 @@
-import datetime
 import importlib
 import os
-
-from flask import current_app
-
-from project.server import db, bcrypt
 
 
 MODELS_DIRECTORY = "project/server/model"

@@ -2,7 +2,7 @@ import os
 
 from redis import Redis
 
-from flask import Flask, render_template
+from flask import Flask, jsonify
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_debugtoolbar import DebugToolbarExtension
@@ -53,15 +53,10 @@ def create_base_app():
 
     # register blueprints
     from project.server.auth.views import auth_blueprint
-    from project.server.main.views import main_blueprint
-    # from project.server.students.views.university import bp as university_bp
-    from project.server.students.views.group import bp as group_bp
-    # from project.server.students.views.fuc import bp as fuc_bp
+    from project.server.group.views import group_blueprint
+
     app.register_blueprint(auth_blueprint)
-    app.register_blueprint(main_blueprint)
-    # app.register_blueprint(university_bp)
-    app.register_blueprint(group_bp)
-    # app.register_blueprint(fuc_bp)
+    app.register_blueprint(group_blueprint)
 
     return app
 
@@ -73,19 +68,19 @@ def create_app(script_info=None):
     # error handlers
     @app.errorhandler(401)
     def unauthorized_page(error):
-        return render_template('errors/401.html'), 401
+        return jsonify({"error": error}), 401
 
     @app.errorhandler(403)
     def forbidden_page(error):
-        return render_template('errors/403.html'), 403
+        return jsonify({"error": error}), 403
 
     @app.errorhandler(404)
     def page_not_found(error):
-        return render_template('errors/404.html'), 404
+        return jsonify({"error": error}), 404
 
     @app.errorhandler(500)
     def server_error_page(error):
-        return render_template('errors/500.html'), 500
+        return jsonify({"error": error}), 500
 
     @app.shell_context_processor
     def ctx():

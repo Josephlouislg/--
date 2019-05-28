@@ -1,16 +1,16 @@
 from functools import update_wrapper
 
 from flask import (
-    render_template, Blueprint, url_for,
-    redirect, flash, request, jsonify,
-    abort)
+    Blueprint, redirect,
+    flash, request,
+    jsonify, abort
+)
 from flask_login import login_user, logout_user, login_required, current_user
 
 from project.server import bcrypt, db
 from project.server.model.user import User
 from project.server.auth.forms import LoginForm, RegisterForm
 
-from project.tasks.sender import send
 from project.lib.user import NewUserService
 
 auth_blueprint = Blueprint('auth', __name__, url_prefix='/auth')
@@ -70,18 +70,6 @@ def logout():
     logout_user()
     resp = {"status": "ok"}
     return jsonify(resp)
-
-
-@auth_blueprint.route('/members')
-@login_required
-def members():
-    return render_template('user/members.html')
-
-
-@auth_blueprint.route('/users')
-def users():
-    users_emails = [user.email for user in User.query.all()]
-    return jsonify({"users_emails": users_emails })
 
 
 @auth_blueprint.route('/confirm_email/<int:user_id>/<token>')

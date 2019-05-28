@@ -1,19 +1,16 @@
-import datetime
-
-from flask import current_app
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship, foreign
 
-from project.server import db, bcrypt
+from project.server import db
 from project.lib.types import TitledEnum, EnumInt
+
 
 class Group(db.Model):
 
     __tablename__ = 'group'
 
     class CURRENCY(TitledEnum):
-        usd = 1, '$'
-        uah = 2, '$'
+        usd = 1, 'USD'
+        uah = 2, 'UAH'
 
     class STATUS(TitledEnum):
         active = 1, 'Активный'
@@ -27,3 +24,14 @@ class Group(db.Model):
     budget = db.Column(db.Float, nullable=False)
     currency = db.Column(EnumInt(CURRENCY), nullable=False, default=CURRENCY.uah)
     status = db.Column(EnumInt(STATUS), nullable=False, default=STATUS.active)
+
+    def serialized(self):
+        return {
+            "id": self.id,
+            "author_id": self.author_id,
+            "group_name": self.group_name,
+            "city": self.city,
+            "budget": self.budget,
+            "currency": self.currency.value,
+            "status": self.status.value,
+        }

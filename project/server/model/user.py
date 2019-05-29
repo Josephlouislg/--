@@ -46,6 +46,11 @@ class User(db.Model, UserMixin):
     def is_active(self):
         return self.status == self.STATUS.active
 
+    def set_password(self, password):
+        self.password = bcrypt.generate_password_hash(
+            password, current_app.config.get('BCRYPT_LOG_ROUNDS')
+        ).decode('utf-8')
+
     @property
     def is_anonymous(self):
         return False

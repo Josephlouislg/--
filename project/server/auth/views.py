@@ -16,7 +16,7 @@ from project.lib.user import NewUserService
 auth_blueprint = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@auth_blueprint.route('/register', methods=['POST', 'GET'])
+@auth_blueprint.route('/register', methods=['POST'])
 def register():
     form = RegisterForm(**request.get_json())
     if form.validate():
@@ -31,6 +31,22 @@ def register():
         db.session.commit()
         login_user(user)
         NewUserService.send_confirmation_email_msg(user=user)
+        resp = {"status": "ok", "user": user.serialized()}
+        return jsonify(resp)
+    return jsonify({"errors": form.errors})
+
+
+@auth_blueprint.route('/update', methods=['POST'])
+def update():
+    user: User = current_user
+    form = RegisterForm(**request.get_json())
+    if form.validate():
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
+        user.phone = form.phone.data
+        user.password = form.password.data
+        db.session.add(user)
+        db.session.commit()
         resp = {"status": "ok", "user": user.serialized()}
         return jsonify(resp)
     return jsonify({"errors": form.errors})

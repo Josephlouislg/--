@@ -1,7 +1,11 @@
+import random
+
 from flask import  Blueprint, request, jsonify, abort
 from flask_login import current_user
 
+from project.lib.user import NewUserService
 from project.server import db
+from project.server.auth.forms import RegisterForm
 from project.server.model.group import Group, MemberGroups
 from project.server.model.user import User
 from project.tasks.import_members import import_users
@@ -17,38 +21,33 @@ def import_members():
     file_data = request.files['file'].read().decode('utf-8')
     group = db.session.query(Group).filter(Group.author_id == current_user.id).first() or abort(404)
     import_users.delay(file_data, group.id)
-    return jsonify({"errors": {}})
-    if False and "form.validate()":
-        group = db.session.query(Group).filter(Group.author_id == current_user.id).first()
-        if not group:
-            group = Group(
-                group_name=form.group_name.data,
-                city=form.city.data,
-                author_id=current_user.id,
-                budget=form.budget.data,
-                currency=Group.CURRENCY.get_as_enum_by_value(int(form.currency.data)),
-            )
-        else:
-            group.group_name = form.group_name.data
-            group.city = form.city.data,
-        db.session.add(group)
-        db.session.commit()
-        resp = {"status": "ok", "group": group.serialized()}
-        return jsonify(resp)
-    return jsonify({"errors": form.errors})
+    return jsonify({"status": 'ok'})
 
 
 @members_blueprint.route('/create', methods=['POST'])
-def get_group():
+def create_member():
     if not current_user:
         abort(401)
-    group = (
-        db.session.query(Group)
-        .filter(Group.author_id == current_user.id)
-        .first()
-    )
-    resp = {"status": "ok", "group": group.serialized() if group else None}
-    return jsonify(resp)
+    group = db.session.query(Group).filter(Group.author_id == current_user.id).first() or abort(404)
+    password = str(random.getrandbits(128))
+    form = RegisterForm(password=password, **request.get_json())
+    if form.validate():
+        user = User(
+            email=form.email.data,
+            password=password,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            phone=form.phone.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        member_group = MemberGroups(group_id=group.id, user_id=user.id)
+        db.session.add(member_group)
+        db.session.commit()
+        NewUserService.send_confirmation_member_email_msg(user=user, password=password)
+        resp = {"status": "ok", "user": user.serialized()}
+        return jsonify(resp)
+    return jsonify({"errors": form.errors})
 
 
 @members_blueprint.route('/list', methods=['GET'])

@@ -50,7 +50,7 @@ class RegisterForm(FlaskForm):
         'password',
         validators=[DataRequired(message="Це поле обов'язкове"), Length(
             min=6,
-            max=25,
-            message='Пароль повинен бути від 6-ох до 25-а символів'
+            max=255,
+            message='Пароль повинен бути від 6-ох до 255-а символів'
         )]
     )

@@ -59,7 +59,6 @@ def create_base_app():
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(group_blueprint)
     app.register_blueprint(members_blueprint)
-
     return app
 
 

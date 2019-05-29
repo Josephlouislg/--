@@ -22,24 +22,22 @@ def import_users(self, csv_data, group_id):
     ):
         password = str(random.getrandbits(128))
         try:
-            # user = User(
-            #     email=email,
-            #     password=password,
-            #     first_name=first_name,
-            #     last_name=last_name,
-            #     phone=phone,
-            #     type=User.TYPE.member
-            # )
-            # db.session.add(user)
-            # db.session.commit()
-            # group_member = MemberGroups(
-            #     user_id=user.id,
-            #     group_id=group_id
-            # )
-            # db.session.add(group_member)
-            # db.session.commit()
-            user = db.session.query(User).filter(User.email == email).first()
+            user = User(
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                phone=phone,
+                type=User.TYPE.member
+            )
+            db.session.add(user)
+            db.session.commit()
+            group_member = MemberGroups(
+                user_id=user.id,
+                group_id=group_id
+            )
+            db.session.add(group_member)
+            db.session.commit()
             NewUserService.send_confirmation_member_email_msg(user=user, password=password)
-            print("dasdsadsdd")
         except Exception as e:
             raise e

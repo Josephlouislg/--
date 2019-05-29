@@ -16,6 +16,10 @@ class User(db.Model, UserMixin):
         active = 2, 'Активный'
         deleted = 3, 'Удален'
 
+    class TYPE(TitledEnum):
+        admin = 1, 'Admin'
+        member = 2, 'member'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
@@ -24,6 +28,7 @@ class User(db.Model, UserMixin):
     phone = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     status = db.Column(EnumInt(STATUS), nullable=False, default=STATUS.email_confirmation)
+    type = db.Column(EnumInt(TYPE), nullable=False, default=TYPE.admin)
 
     def __init__(self, email, password, *args, **kwargs):
         self.email = email
@@ -33,17 +38,13 @@ class User(db.Model, UserMixin):
         self.registered_on = datetime.datetime.now()
         super().__init__(*args, **kwargs)
 
-    # @property
-    # def is_active(self):
-    #     return True
-
     @property
     def is_authenticated(self):
         return True
 
     @property
     def is_active(self):
-        return True
+        return self.status == self.STATUS.active
 
     @property
     def is_anonymous(self):
@@ -60,7 +61,7 @@ class User(db.Model, UserMixin):
             "last_name": self.last_name,
             "phone": self.phone,
             "status": self.status.value,
-            "is_admin": True
+            "is_admin": self.type == self.TYPE.admin
         }
 
     def __repr__(self):

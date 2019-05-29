@@ -40,3 +40,18 @@ class NewUserService(object):
             db.session.add(user)
             db.session.commit()
             return True
+
+    @classmethod
+    def send_confirmation_member_email_msg(cls, user, password):
+        token = cls.generate_confirfation_token(user)
+        confirmation_url = url_for('auth.confirm_email', token=token, user_id=user.id)
+        body = render_template(
+            'emails/email_confirmation.html',
+            confirmation_url=confirmation_url,
+            password=password
+        )
+        send.delay(
+            emails=(user.email,),
+            subject='Підвтердження електронної адреси',
+            body=body
+        )

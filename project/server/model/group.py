@@ -39,8 +39,10 @@ class Group(db.Model):
         }
 
 
-association_member_group = Table(
-    'association_member_group', meta,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('group_id', Integer, ForeignKey('group.id')),
-)
+class MemberGroups(db.Model):
+
+    __tablename__ = 'association_member_group'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    group_id = db.Column(db.Integer, ForeignKey('group.id'))
+    user_id = db.Column(db.Integer, ForeignKey('user.id'))

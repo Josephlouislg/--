@@ -54,9 +54,11 @@ def create_base_app():
     # register blueprints
     from project.server.auth.views import auth_blueprint
     from project.server.group.views import group_blueprint
+    from project.server.members.views import members_blueprint
 
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(group_blueprint)
+    app.register_blueprint(members_blueprint)
 
     return app
 
@@ -68,19 +70,19 @@ def create_app(script_info=None):
     # error handlers
     @app.errorhandler(401)
     def unauthorized_page(error):
-        return jsonify({"error": error}), 401
+        return jsonify({"error": {}}), 401
 
     @app.errorhandler(403)
     def forbidden_page(error):
-        return jsonify({"error": error}), 403
+        return jsonify({"error": {}}), 403
 
     @app.errorhandler(404)
     def page_not_found(error):
-        return jsonify({"error": error}), 404
+        return jsonify({"error": {}}), 404
 
     @app.errorhandler(500)
     def server_error_page(error):
-        return jsonify({"error": error}), 500
+        return jsonify({"error": {}}), 500
 
     @app.shell_context_processor
     def ctx():

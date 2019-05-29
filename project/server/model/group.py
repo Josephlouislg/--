@@ -1,7 +1,9 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Integer, Column, Table, MetaData
 
 from project.server import db
 from project.lib.types import TitledEnum, EnumInt
+
+meta = MetaData()
 
 
 class Group(db.Model):
@@ -35,3 +37,10 @@ class Group(db.Model):
             "currency": self.currency.value,
             "status": self.status.value,
         }
+
+
+association_member_group = Table(
+    'association_member_group', meta,
+    Column('user_id', Integer, ForeignKey('user.id')),
+    Column('group_id', Integer, ForeignKey('group.id')),
+)

@@ -52,7 +52,21 @@ def create_member():
 
 @members_blueprint.route('/list', methods=['GET'])
 def get_list():
-    members = db.session.query(User).all()
-    assoc = db.session.query(MemberGroups).all()
-    resp = {"status": "ok", "users": [u.serialized() for u in members], "sdads": [(i.user_id, i.group_id) for i in assoc]}
+    members = (
+        db.session.query(User)
+        .select_from(Group)
+        .join(MemberGroups, MemberGroups.group_id == Group.id)
+        .join(User, MemberGroups.user_id == User.id)
+        .filter(Group.author_id == current_user.id)
+        .all()
+    )
+    resp = {"status": "ok", "members": [u.serialized() for u in members]}
     return jsonify(resp)
+
+@members_blueprint.route('/delete/<id_>', methods=['GET'])
+def delete(id_):
+    db.session.query(MemberGroups).filter(MemberGroups.user_id == id_).delete()
+    resp = {"status": "ok", "members": [u.serialized() for u in members]}
+    return jsonify(resp)
+
+

@@ -34,9 +34,9 @@ services:
     ports:
       - 3000:3000
     command: npm start
-    working_dir: "/front"
+    working_dir: "/frontend"
     volumes:
-      - "../front/:/front"
+      - "../frontend/:/frontend"
 
   nginx:
     image: nginx:1.14.0-alpine
@@ -51,11 +51,6 @@ services:
     image: redis
     ports:
       - 6379
-
-  rabbit:
-    image: rabbitmq
-    ports:
-      - 5672
 
   celery:
     image: web

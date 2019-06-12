@@ -74,7 +74,7 @@ def login():
 @auth_blueprint.route('/user', methods=['GET'])
 def get_user():
     resp = {
-        "need_auth": current_user is None,
+        "need_auth": current_user is current_user.is_authenticated,
         "user": current_user.serialized() if current_user.is_authenticated else None
     }
     return jsonify(resp)
